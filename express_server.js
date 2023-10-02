@@ -11,7 +11,7 @@ const urlDatabase = {
 
 const routes = {
   '/': function(req, res) {
-    res.send("hello");
+    res.render('urls_index', {urls: urlDatabase});
   },
 
   '/urls.json': function(req, res) {
