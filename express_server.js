@@ -44,7 +44,12 @@ const routes = {
   '/urls/:id': function(req, res) {
     const vars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
     res.render('url_show', vars);
-  }
+  },
+
+  '/u/:id': function(req, res) {
+    const longURL = urlDatabase[req.params.id];
+    res.redirect(longURL);
+   }
 };
 
 for (const r in routes) {
@@ -55,9 +60,9 @@ for (const r in routes) {
 app.post("/urls", (req, res) => {
   //console.log(req.body); // Log the POST request body to the console
   // res.send("Ok"); // Respond with 'Ok' (we will replace this)
-  urlDatabase[generateRandomString(6)] = req.body.longURL;
-  res.redirect(200, '/urls');
-  res.end();
+  const id = generateRandomString(6);
+  urlDatabase[id] = req.body.longURL;
+  res.redirect(`urls/${id}`);
 });
 
 app.listen(PORT, () => {
