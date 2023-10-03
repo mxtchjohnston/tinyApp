@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
+const cookie = require('cookie-parser');
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
+app.use(cookie());
 app.use(express.urlencoded({ extended: true }));
 
 const generateRandomString = function(num) {
@@ -21,7 +23,7 @@ const urlDatabase = {
 
 const routes = {
   '/': function(req, res) {
-    res.render('urls_index', {urls: urlDatabase});
+    res.render('urls_index', {urls: urlDatabase, username: req.cookies['username']});
   },
 
   '/urls.json': function(req, res) {
@@ -29,20 +31,16 @@ const routes = {
   },
 
   '/urls': function(req, res) {
-    const templateVars = {urls: urlDatabase};
+    const templateVars = {urls: urlDatabase, username: req.cookies['username']};
     res.render("urls_index", templateVars);
   },
 
-  '/hello': function(req, res) {
-    res.send("<html><body>Hello <b>World</b></body></html>\n");
-  },
-
   '/urls/new': function(req, res) {
-    res.render("urls_new");
+    res.render("urls_new", {username: req.cookies['username']});
   },
 
   '/urls/:id': function(req, res) {
-    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
+    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies['username']};
     res.render('url_show', vars);
   },
 
