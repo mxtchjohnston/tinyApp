@@ -57,6 +57,11 @@ const posts = {
     res.redirect('/urls');
   },
 
+  '/logout': function(req, res) {
+    res.clearCookie('username');
+    res.redirect('/urls');
+  },
+
   '/urls/:id/delete': function(req, res) {
     const id = req.params.id;
     //console.log(id);
