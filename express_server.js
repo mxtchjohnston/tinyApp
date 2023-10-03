@@ -53,6 +53,12 @@ const routes = {
 };
 
 const posts = {
+  '/login': function(req, res) {
+    const username = req.body.username;
+    res.cookie('username', username);
+    res.redirect('/urls');
+  },
+
   '/urls/:id/delete': function(req, res) {
     const id = req.params.id;
     //console.log(id);
