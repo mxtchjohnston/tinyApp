@@ -60,10 +60,19 @@ const posts = {
     res.redirect(`/urls`);
   },
 
+  '/urls/:id': function(req, res) {
+    // console.log(req.body.field);
+    // console.log(req.params.id);
+    const field = req.body.field;
+    const id = req.params.id;
+    urlDatabase[id] = field;
+    res.redirect('/urls')
+  },
+
   '/urls': function(req, res) {
     const id = generateRandomString(6);
     urlDatabase[id] = req.body.longURL;
-    res.redirect(`urls/${id}`);
+    res.redirect(`/urls/${id}`);
   },
 }
 

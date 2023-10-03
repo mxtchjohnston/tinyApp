@@ -11,9 +11,15 @@
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
       </div>
-      <div class="card-footer text-muted"></div>
+      <div class="card-footer text-muted">
+        <h4 class="card-title">Edit</h4>
+        <form method="POST" action="/urls/<%= id %>">
+          <label for="field">New URL:</label>
+          <input type="text" id="field" name="field" placeholder="<%= longURL %>"/>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
     </div>
-    <!-- Bootstrap JS -->
     <%- include('partials/_footer')%>
   </body>
 </html>
