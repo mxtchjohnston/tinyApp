@@ -6,7 +6,7 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
 const generateRandomString = function(num) {
-  const randomNum = () => Math.floor(Math.random() * 94) + 32;
+  const randomNum = () => Math.floor(Math.random() * 26) + 97;
   const array = [];
   for (let i = 0; i < num; i++) {
     array.push(randomNum());
@@ -52,18 +52,29 @@ const routes = {
    }
 };
 
+const posts = {
+  '/urls/:id/delete': function(req, res) {
+    const id = req.params.id;
+    //console.log(id);
+    delete urlDatabase[id];
+    res.redirect(`/urls`);
+  },
+
+  '/urls': function(req, res) {
+    const id = generateRandomString(6);
+    urlDatabase[id] = req.body.longURL;
+    res.redirect(`urls/${id}`);
+  },
+}
+
 for (const r in routes) {
   app.get(r, routes[r]);
   //console.log(r);
 }
 
-app.post("/urls", (req, res) => {
-  //console.log(req.body); // Log the POST request body to the console
-  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
-  const id = generateRandomString(6);
-  urlDatabase[id] = req.body.longURL;
-  res.redirect(`urls/${id}`);
-});
+for (const p in posts) {
+  app.post(p, posts[p]);
+}
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
