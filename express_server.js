@@ -28,6 +28,10 @@ const routes = {
     res.render('urls_index', {urls: urlDatabase, username: req.cookies['username']});
   },
 
+  '/register': function(req, res) {
+    res.render('register', {username: undefined});
+  },
+
   '/urls.json': function(req, res) {
     res.json(urlDatabase);
   },
