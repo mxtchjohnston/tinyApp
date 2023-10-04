@@ -44,10 +44,16 @@ const routes = {
   },
 
   '/register': function(req, res) {
+    if (req.cookies.userID) {
+      return res.redirect('urls');
+    }
     res.render('register', {user: userDatabase[req.cookies.userID]});
   },
 
   '/login': function(req, res) {
+    if (req.cookies.userID) {
+      return res.redirect('urls');
+    }
     res.render('login', {user: userDatabase[req.cookies.userID]});
   },
 
@@ -88,6 +94,9 @@ const posts = {
 
     const user = getUserByEmail(email);
 
+    if (!user) {
+      return res.status(400).send('User not found');
+    }
     if (user.password === password) {
       res.cookie('userID', user.id);
       res.redirect('/urls');
