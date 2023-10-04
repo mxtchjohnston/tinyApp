@@ -4,6 +4,16 @@
 <body>
   <%- include('partials/_header') %>
 
+  <form method="POST" action="/register">
+    <label>Email</label>
+    <input type="email" name="email"/>
+    <br/>
+    <label>Password</label>
+    <input type="password" name="password"/>
+    <br/>
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+
   <%- include('partials/_footer') %>
 </body>
 </html>
