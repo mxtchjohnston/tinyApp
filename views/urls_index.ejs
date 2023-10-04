@@ -10,7 +10,7 @@
           <tr>
             <th scope="col">Short URL ID</th>
             <th scope="col">Long URL</th>
-            <th scope="col">More</th>
+            <th scope="col">Edit</th>
             <th scope="col">Delete</th>
           </tr>
         </thead>
@@ -21,7 +21,7 @@
               <td><a href="<%= urls[id] %>"><%= urls[id] %></a></td>
               <td>
                 <form method="GET" action="/urls/<%= id %>/">
-                  <button type="submit" class="btn btn-secondary">More</button>
+                  <button type="submit" class="btn btn-secondary">...</button>
                 </form>
               </td>
               <td>
