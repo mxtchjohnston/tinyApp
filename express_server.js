@@ -36,7 +36,7 @@ const getUserByEmail = function(email) {
   }
 
   return found;
-}
+};
 
 const routes = {
   '/': function(req, res) {
@@ -44,7 +44,11 @@ const routes = {
   },
 
   '/register': function(req, res) {
-    res.render('register', {user: undefined});
+    res.render('register', {user: req.cookies.userID});
+  },
+
+  '/login': function(req, res) {
+    res.render('login', {user: req.cookies.userID});
   },
 
   '/urls.json': function(req, res) {
@@ -68,14 +72,28 @@ const routes = {
   '/u/:id': function(req, res) {
     const longURL = urlDatabase[req.params.id];
     res.redirect(longURL);
-   }
+  }
 };
 
 const posts = {
   '/login': function(req, res) {
-    const username = req.body.username;
-    res.cookie('username', username);
-    res.redirect('/urls');
+    const email = req.body.email;
+    const password = req.body.password;
+
+    //if empty
+    if (email === "" || password === "") {
+      res.status(400).send("Please enter an email and/or password");
+      return;
+    }
+
+    const user = getUserByEmail(email);
+
+    if (user.password === password) {
+      res.cookie('userID', user);
+      res.redirect('/urls');
+    } else {
+      res.status(403).send("Somethings wrong with your username and password");
+    }
   },
 
   '/register': function(req, res) {
@@ -97,9 +115,9 @@ const posts = {
     const id = generateRandomString(6);
 
     userDatabase[id] = {id, email, password};
-    res.cookie('userID', userDatabase[id]);
-    console.log(userDatabase);
-    res.redirect('/');
+    //res.cookie('userID', userDatabase[id]);
+    //console.log(userDatabase);
+    res.redirect('/login');
   },
 
   '/logout': function(req, res) {
@@ -120,7 +138,7 @@ const posts = {
     const field = req.body.field;
     const id = req.params.id;
     urlDatabase[id] = field;
-    res.redirect('/urls')
+    res.redirect('/urls');
   },
 
   '/urls': function(req, res) {
@@ -128,7 +146,7 @@ const posts = {
     urlDatabase[id] = req.body.longURL;
     res.redirect(`/urls/${id}`);
   },
-}
+};
 
 for (const r in routes) {
   app.get(r, routes[r]);
