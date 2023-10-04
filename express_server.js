@@ -44,11 +44,11 @@ const routes = {
   },
 
   '/register': function(req, res) {
-    res.render('register', {user: req.cookies.userID});
+    res.render('register', {user: userDatabase[req.cookies.userID]});
   },
 
   '/login': function(req, res) {
-    res.render('login', {user: req.cookies.userID});
+    res.render('login', {user: userDatabase[req.cookies.userID]});
   },
 
   '/urls.json': function(req, res) {
@@ -56,16 +56,16 @@ const routes = {
   },
 
   '/urls': function(req, res) {
-    const templateVars = {urls: urlDatabase, user: req.cookies.userID};
+    const templateVars = {urls: urlDatabase, user: userDatabase[req.cookies.userID]};
     res.render("urls_index", templateVars);
   },
 
   '/urls/new': function(req, res) {
-    res.render("urls_new", {user: req.cookies.userID});
+    res.render("urls_new", {user: userDatabase[req.cookies.userID]});
   },
 
   '/urls/:id': function(req, res) {
-    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], user: req.cookies.userID};
+    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], user: userDatabase[req.cookies.userID]};
     res.render('url_show', vars);
   },
 
@@ -89,7 +89,7 @@ const posts = {
     const user = getUserByEmail(email);
 
     if (user.password === password) {
-      res.cookie('userID', user);
+      res.cookie('userID', user.id);
       res.redirect('/urls');
     } else {
       res.status(403).send("Somethings wrong with your username and password");
