@@ -23,13 +23,15 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const userDatabase = {};
+
 const routes = {
   '/': function(req, res) {
-    res.render('urls_index', {urls: urlDatabase, username: req.cookies['username']});
+    res.redirect('/urls');
   },
 
   '/register': function(req, res) {
-    res.render('register', {username: undefined});
+    res.render('register', {user: undefined});
   },
 
   '/urls.json': function(req, res) {
@@ -37,16 +39,16 @@ const routes = {
   },
 
   '/urls': function(req, res) {
-    const templateVars = {urls: urlDatabase, username: req.cookies['username']};
+    const templateVars = {urls: urlDatabase, user: req.cookies.userID};
     res.render("urls_index", templateVars);
   },
 
   '/urls/new': function(req, res) {
-    res.render("urls_new", {username: req.cookies['username']});
+    res.render("urls_new", {user: req.cookies.userID});
   },
 
   '/urls/:id': function(req, res) {
-    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies['username']};
+    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], user: req.cookies.userID};
     res.render('url_show', vars);
   },
 
@@ -63,8 +65,28 @@ const posts = {
     res.redirect('/urls');
   },
 
+  '/register': function(req, res) {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    //if empty
+    if (email === "" || password === "") {
+      res.sendStatus(400).send("Please enter an email and/or password");
+      return;
+    }
+
+    
+
+    const id = generateRandomString(6);
+
+    userDatabase[id] = {id, email, password};
+    res.cookie('userID', userDatabase[id]);
+    console.log(userDatabase);
+    res.redirect('/');
+  },
+
   '/logout': function(req, res) {
-    res.clearCookie('username');
+    res.clearCookie('userID');
     res.redirect('/urls');
   },
 
