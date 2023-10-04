@@ -25,6 +25,19 @@ const urlDatabase = {
 
 const userDatabase = {};
 
+const getUserByEmail = function(email) {
+  let found = undefined;
+
+  for (const key in userDatabase) {
+    if (userDatabase[key].email === email) {
+      found = userDatabase[key];
+      break;
+    }
+  }
+
+  return found;
+}
+
 const routes = {
   '/': function(req, res) {
     res.redirect('/urls');
@@ -71,11 +84,15 @@ const posts = {
 
     //if empty
     if (email === "" || password === "") {
-      res.sendStatus(400).send("Please enter an email and/or password");
+      res.status(400).send("Please enter an email and/or password");
       return;
     }
 
-    
+    //if email exists
+    if (getUserByEmail(email)) {
+      res.status(400).send("User already exists");
+      return;
+    }
 
     const id = generateRandomString(6);
 
