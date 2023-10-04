@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
 const cookie = require('cookie-parser');
+const morgan = require('morgan');
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
 app.use(cookie());
+app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 const generateRandomString = function(num) {
