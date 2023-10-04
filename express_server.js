@@ -62,15 +62,25 @@ const routes = {
   },
 
   '/urls': function(req, res) {
+    if (!req.cookies.userID) {
+      return res.redirect('/login');
+    }
     const templateVars = {urls: urlDatabase, user: userDatabase[req.cookies.userID]};
     res.render("urls_index", templateVars);
   },
 
   '/urls/new': function(req, res) {
+    if (!req.cookies.userID) {
+      return res.redirect('/login');
+    }
     res.render("urls_new", {user: userDatabase[req.cookies.userID]});
   },
 
   '/urls/:id': function(req, res) {
+    if (urlDatabase[req.params.id]) {
+      return res.status(400).send('This Id is not in our database');
+    }
+    
     const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], user: userDatabase[req.cookies.userID]};
     res.render('url_show', vars);
   },
@@ -151,6 +161,9 @@ const posts = {
   },
 
   '/urls': function(req, res) {
+    if (!req.cookies.userID) {
+      return res.status(400).send('You must be logged in to create a new url');
+    }
     const id = generateRandomString(6);
     urlDatabase[id] = req.body.longURL;
     res.redirect(`/urls/${id}`);
