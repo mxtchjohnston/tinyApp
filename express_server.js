@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cookie = require('cookie-parser');
 const morgan = require('morgan');
+const util = require('./util');
 const PORT = 8080; // default port 8080
 
 app.set('view engine', 'ejs');
@@ -9,39 +10,7 @@ app.use(cookie());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
-const generateRandomString = function(num) {
-  const randomNum = () => Math.floor(Math.random() * 26) + 97;
-  const array = [];
-  for (let i = 0; i < num; i++) {
-    array.push(randomNum());
-  }
-  return String.fromCodePoint(...array);
-};
 
-const getUserByEmail = function(email) {
-  let found = undefined;
-
-  for (const key in userDatabase) {
-    if (userDatabase[key].email === email) {
-      found = userDatabase[key];
-      break;
-    }
-  }
-
-  return found;
-};
-
-const objectFilter = function(object, predicate) {
-  const toReturn = {}
-  for (const key in object) {
-    if (predicate(object[key])) toReturn[key] = object[key];
-  }
-  return toReturn;
-}
-
-const getUrlsForUser = function(dictionary, userID) {
-  return objectFilter(dictionary, k => k.userID === userID)
-}
 
 const urlDatabase = {
   "b2xVn2": { 
@@ -90,7 +59,7 @@ const routes = {
     if (!userID) {
       return res.redirect('/login');
     }
-    const urls = getUrlsForUser(urlDatabase, userID);
+    const urls = util.getUrlsForUser(urlDatabase, userID);
     const templateVars = {urls, user: userDatabase[userID]};
     res.render("urls_index", templateVars);
   },
@@ -128,7 +97,7 @@ const posts = {
       return;
     }
 
-    const user = getUserByEmail(email);
+    const user = util.getUserByEmail(email, userDatabase);
 
     if (!user) {
       return res.status(400).send('User not found');
@@ -152,12 +121,12 @@ const posts = {
     }
 
     //if email exists
-    if (getUserByEmail(email)) {
+    if (util.getUserByEmail(email, userDatabase)) {
       res.status(400).send("User already exists");
       return;
     }
 
-    const id = generateRandomString(6);
+    const id = util.generateRandomString(6);
 
     userDatabase[id] = {id, email, password};
     //res.cookie('userID', userDatabase[id]);
@@ -203,7 +172,7 @@ const posts = {
     if (!userID) {
       return res.status(400).send('You must be logged in to create a new url');
     }
-    const id = generateRandomString(6);
+    const id = util.generateRandomString(6);
     urlDatabase[id] = { longURL: req.body.longURL, userID};
     res.redirect(`/urls/${id}`);
   },
