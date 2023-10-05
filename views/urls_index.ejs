@@ -15,17 +15,17 @@
           </tr>
         </thead>
         <tbody>
-          <% for (let id in urls) { %>
+          <% for (const key in urls) { %>
             <tr>
-              <td><%= id %></td>
-              <td><p><%= urls[id].longURL %></p></td>
+              <td><%= key %></td>
+              <td><p><%= urls[key].longURL %></p></td>
               <td>
-                <form method="GET" action="/urls/<%= id %>/">
+                <form method="GET" action="/urls/<%= key %>/">
                   <button type="submit" class="btn btn-secondary">...</button>
                 </form>
               </td>
               <td>
-                <form method="POST" action="/urls/<%= id %>/delete">
+                <form method="POST" action="/urls/<%= key %>/delete">
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </td>

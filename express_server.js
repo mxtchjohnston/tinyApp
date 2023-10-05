@@ -18,6 +18,27 @@ const generateRandomString = function(num) {
   return String.fromCodePoint(...array);
 };
 
+const getUserByEmail = function(email) {
+  let found = undefined;
+
+  for (const key in userDatabase) {
+    if (userDatabase[key].email === email) {
+      found = userDatabase[key];
+      break;
+    }
+  }
+
+  return found;
+};
+
+const objectFilter = function(object, predicate) {
+  const toReturn = {}
+  for (const key in object) {
+    if (predicate(object[key])) toReturn[key] = object[key];
+  }
+  return toReturn;
+}
+
 const urlDatabase = {
   "b2xVn2": { 
     longURL: "http://www.lighthouselabs.ca",
@@ -33,21 +54,8 @@ const userDatabase = {
   "admin": {
     id: "admin",
     email: "a@dmin",
-    password: "5up3r 53cur3"
+    password: "1234"
   }
-};
-
-const getUserByEmail = function(email) {
-  let found = undefined;
-
-  for (const key in userDatabase) {
-    if (userDatabase[key].email === email) {
-      found = userDatabase[key];
-      break;
-    }
-  }
-
-  return found;
 };
 
 const routes = {
@@ -74,10 +82,12 @@ const routes = {
   },
 
   '/urls': function(req, res) {
-    if (!req.cookies.userID) {
+    const userID = req.cookies.userID;
+    if (!userID) {
       return res.redirect('/login');
     }
-    const templateVars = {urls: urlDatabase, user: userDatabase[req.cookies.userID]};
+    const urls = objectFilter(urlDatabase, o => o.userID === userID);
+    const templateVars = {urls, user: userDatabase[userID]};
     res.render("urls_index", templateVars);
   },
 
@@ -89,7 +99,7 @@ const routes = {
   },
 
   '/urls/:id': function(req, res) {
-    if (urlDatabase[req.params.id]) {
+    if (!urlDatabase[req.params.id]) {
       return res.status(400).send('This Id is not in our database');
     }
 
@@ -158,6 +168,9 @@ const posts = {
 
   '/urls/:id/delete': function(req, res) {
     const id = req.params.id;
+    if(req.cookies.userID !== urlDatabase[id].userID) {
+      return res.status(400).send('You do not have permission to modify this resource');
+    }
     //console.log(id);
     delete urlDatabase[id];
     res.redirect(`/urls`);
@@ -166,18 +179,27 @@ const posts = {
   '/urls/:id': function(req, res) {
     // console.log(req.body.field);
     // console.log(req.params.id);
-    const field = req.body.field;
+    
+    const longURL = req.body.field;
     const id = req.params.id;
-    urlDatabase[id] = field;
+    const userID = req.cookies.userID;
+
+    if(userID !== urlDatabase[id].userID) {
+      return res.status(400).send('You do not have permission to modify this resource');
+    }
+
+    urlDatabase[id] = {longURL, userID};
+    console.log(urlDatabase);
     res.redirect('/urls');
   },
 
   '/urls': function(req, res) {
-    if (!req.cookies.userID) {
+    const userID = req.cookies.userID;
+    if (!userID) {
       return res.status(400).send('You must be logged in to create a new url');
     }
     const id = generateRandomString(6);
-    urlDatabase[id] = req.body.longURL;
+    urlDatabase[id] = { longURL: req.body.longURL, userID};
     res.redirect(`/urls/${id}`);
   },
 };
