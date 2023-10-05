@@ -14,11 +14,11 @@ app.use(express.urlencoded({ extended: true }));
 
 //encrypted, secure, blazingly-fast, 7 sigma database
 const urlDatabase = {
-  "b2xVn2": { 
+  "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
     userID: 'admin'
   },
-  "9sm5xK": { 
+  "9sm5xK": {
     longURL: "http://www.google.com",
     userID: 'admin'
   }
@@ -145,7 +145,7 @@ const posts = {
 
   '/urls/:id/delete': (req, res) => {
     const id = req.params.id;
-    if(req.cookies.userID !== urlDatabase[id].userID) {
+    if (req.cookies.userID !== urlDatabase[id].userID) {
       return res.status(400).send('You do not have permission to modify this resource');
     }
     //console.log(id);
@@ -161,7 +161,7 @@ const posts = {
     const id = req.params.id;
     const userID = req.cookies.userID;
 
-    if(userID !== urlDatabase[id].userID) {
+    if (userID !== urlDatabase[id].userID) {
       return res.status(400).send('You do not have permission to modify this resource');
     }
 

@@ -21,7 +21,7 @@ const getUserByEmail = (email, userDatabase) => {
 };
 
 const objectFilter = (object, predicate) => {
-  const toReturn = {}
+  const toReturn = {};
   for (const key in object) {
     if (predicate(object[key])) toReturn[key] = object[key];
   }
@@ -29,7 +29,7 @@ const objectFilter = (object, predicate) => {
 };
 
 const getUrlsForUser = (dictionary, userID) => {
-  return objectFilter(dictionary, k => k.userID === userID)
+  return objectFilter(dictionary, k => k.userID === userID);
 };
 
-module.exports = {generateRandomString, getUserByEmail, getUrlsForUser}
+module.exports = {generateRandomString, getUserByEmail, getUrlsForUser};
