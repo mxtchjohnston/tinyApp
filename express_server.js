@@ -117,7 +117,7 @@ const posts = {
     if (!user) {
       return res.status(400).send('User not found');
     }
-    if (user.password === password) {
+    if (bcrypt.compareSync(password, user.password)) {
       res.cookie('userID', user.id);
       res.redirect('/urls');
     } else {
