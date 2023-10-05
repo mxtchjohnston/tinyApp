@@ -49,19 +49,15 @@ const routes = {
     if (req.session.userID) {
       return res.redirect('urls');
     }
-    res.render('register', {user: userDatabase[req.session.userID]});
+    res.render('pages/register', {user: userDatabase[req.session.userID]});
   },
 
   '/login': (req, res) => {
     if (req.session.userID) {
       return res.redirect('urls');
     }
-    res.render('login', {user: userDatabase[req.session.userID]});
+    res.render('pages/login', {user: userDatabase[req.session.userID]});
   },
-
-  // '/urls.json': (req, res) => { this is a security risk
-  //   res.json(urlDatabase);
-  // },
 
   '/urls': (req, res) => {
     const userID = req.session.userID;
@@ -70,14 +66,14 @@ const routes = {
     }
     const urls = util.getUrlsForUser(urlDatabase, userID);
     const templateVars = {urls, user: userDatabase[userID]};
-    res.render("urls_index", templateVars);
+    res.render("pages/urls_index", templateVars);
   },
 
   '/urls/new': (req, res) => {
     if (!req.session.userID) {
       return res.redirect('/login');
     }
-    res.render("urls_new", {user: userDatabase[req.session.userID]});
+    res.render("pages/urls_new", {user: userDatabase[req.session.userID]});
   },
 
   '/urls/:id': (req, res) => {
@@ -86,7 +82,7 @@ const routes = {
     }
 
     const vars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.session.userID]};
-    res.render('url_show', vars);
+    res.render('pages/url_show', vars);
   },
 
   '/u/:id': (req, res) => {
@@ -174,7 +170,7 @@ const posts = {
     }
 
     urlDatabase[id] = {longURL, userID};
-    console.log(urlDatabase);
+    //console.log(urlDatabase);
     res.redirect('/urls');
   },
 
