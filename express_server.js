@@ -4,11 +4,17 @@ const morgan = require('morgan');
 const util = require('./util');
 const PORT = 8080; // default port 8080
 
-
+//BCRYPT EXAMPLE
 const bcrypt = require('bcryptjs');
 console.log(bcrypt);
 
-bcrypt.genSalt(10);
+const salt = bcrypt.genSaltSync(10);
+// console.log('salt:', salt);
+
+// const hashed = bcrypt.hashSync('1234', salt);
+
+// console.log(bcrypt.compareSync('monkey', hashed));
+//
 
 //set up app
 const app = express();
@@ -137,9 +143,10 @@ const posts = {
 
     const id = util.generateRandomString(6);
 
-    userDatabase[id] = {id, email, password};
+
+    userDatabase[id] = {id, email, password: bcrypt.hashSync(password, 10)};
     //res.cookie('userID', userDatabase[id]);
-    //console.log(userDatabase);
+    console.log(userDatabase);
     res.cookie('userID', id);
     res.redirect('/urls');
   },
