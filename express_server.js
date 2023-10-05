@@ -39,6 +39,10 @@ const objectFilter = function(object, predicate) {
   return toReturn;
 }
 
+const getUrlsForUser = function(dictionary, userID) {
+  return objectFilter(dictionary, k => k.userID === userID)
+}
+
 const urlDatabase = {
   "b2xVn2": { 
     longURL: "http://www.lighthouselabs.ca",
@@ -86,7 +90,7 @@ const routes = {
     if (!userID) {
       return res.redirect('/login');
     }
-    const urls = objectFilter(urlDatabase, o => o.userID === userID);
+    const urls = getUrlsForUser(urlDatabase, userID);
     const templateVars = {urls, user: userDatabase[userID]};
     res.render("urls_index", templateVars);
   },
@@ -158,7 +162,8 @@ const posts = {
     userDatabase[id] = {id, email, password};
     //res.cookie('userID', userDatabase[id]);
     //console.log(userDatabase);
-    res.redirect('/login');
+    res.cookie('userID', id);
+    res.redirect('/urls');
   },
 
   '/logout': function(req, res) {
