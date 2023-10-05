@@ -1,5 +1,5 @@
 const express = require("express");
-const cookie = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const util = require('./util');
 const PORT = 8080; // default port 8080
@@ -19,7 +19,10 @@ const salt = bcrypt.genSaltSync(10);
 //set up app
 const app = express();
 app.set('view engine', 'ejs');
-app.use(cookie());
+app.use(cookieSession({
+  name: 'whatever',
+  keys: [bcrypt.hashSync('qwerty', 10)],
+}))
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
@@ -51,17 +54,17 @@ const routes = {
   },
 
   '/register': (req, res) => {
-    if (req.cookies.userID) {
+    if (req.session.userID) {
       return res.redirect('urls');
     }
-    res.render('register', {user: userDatabase[req.cookies.userID]});
+    res.render('register', {user: userDatabase[req.session.userID]});
   },
 
   '/login': (req, res) => {
-    if (req.cookies.userID) {
+    if (req.session.userID) {
       return res.redirect('urls');
     }
-    res.render('login', {user: userDatabase[req.cookies.userID]});
+    res.render('login', {user: userDatabase[req.session.userID]});
   },
 
   '/urls.json': (req, res) => {
@@ -69,7 +72,7 @@ const routes = {
   },
 
   '/urls': (req, res) => {
-    const userID = req.cookies.userID;
+    const userID = req.session.userID;
     if (!userID) {
       return res.redirect('/login');
     }
@@ -79,10 +82,10 @@ const routes = {
   },
 
   '/urls/new': (req, res) => {
-    if (!req.cookies.userID) {
+    if (!req.session.userID) {
       return res.redirect('/login');
     }
-    res.render("urls_new", {user: userDatabase[req.cookies.userID]});
+    res.render("urls_new", {user: userDatabase[req.session.userID]});
   },
 
   '/urls/:id': (req, res) => {
@@ -90,7 +93,7 @@ const routes = {
       return res.status(400).send('This Id is not in our database');
     }
 
-    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.cookies.userID]};
+    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.session.userID]};
     res.render('url_show', vars);
   },
 
@@ -118,7 +121,7 @@ const posts = {
       return res.status(400).send('User not found');
     }
     if (bcrypt.compareSync(password, user.password)) {
-      res.cookie('userID', user.id);
+      req.session.userID = user.id;
       res.redirect('/urls');
     } else {
       res.status(403).send("Somethings wrong with your username and password");
@@ -147,18 +150,18 @@ const posts = {
     userDatabase[id] = {id, email, password: bcrypt.hashSync(password, 10)};
     //res.cookie('userID', userDatabase[id]);
     console.log(userDatabase);
-    res.cookie('userID', id);
+    req.session.userID = id;
     res.redirect('/urls');
   },
 
   '/logout': (req, res) => {
-    res.clearCookie('userID');
+    req.session = null;
     res.redirect('/urls');
   },
 
   '/urls/:id/delete': (req, res) => {
     const id = req.params.id;
-    if (req.cookies.userID !== urlDatabase[id].userID) {
+    if (req.session.userID !== urlDatabase[id].userID) {
       return res.status(400).send('You do not have permission to modify this resource');
     }
     //console.log(id);
@@ -172,7 +175,7 @@ const posts = {
     
     const longURL = req.body.field;
     const id = req.params.id;
-    const userID = req.cookies.userID;
+    const userID = req.session.userID;
 
     if (userID !== urlDatabase[id].userID) {
       return res.status(400).send('You do not have permission to modify this resource');
@@ -184,7 +187,7 @@ const posts = {
   },
 
   '/urls': (req, res) => {
-    const userID = req.cookies.userID;
+    const userID = req.session.userID;
     if (!userID) {
       return res.status(400).send('You must be logged in to create a new url');
     }
