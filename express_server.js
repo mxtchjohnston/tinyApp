@@ -12,7 +12,7 @@ const bcrypt = require('bcryptjs');
 const app = express();
 app.set('view engine', 'ejs');
 app.use(cookieSession({
-  name: 'whatever',
+  name: 'session',
   keys: [bcrypt.hashSync('qwerty', 10)],
 }));
 app.use(morgan('dev'));
@@ -59,9 +59,9 @@ const routes = {
     res.render('login', {user: userDatabase[req.session.userID]});
   },
 
-  '/urls.json': (req, res) => {
-    res.json(urlDatabase);
-  },
+  // '/urls.json': (req, res) => { this is a security risk
+  //   res.json(urlDatabase);
+  // },
 
   '/urls': (req, res) => {
     const userID = req.session.userID;
