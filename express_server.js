@@ -19,11 +19,23 @@ const generateRandomString = function(num) {
 };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": { 
+    longURL: "http://www.lighthouselabs.ca",
+    userID: 'admin'
+  },
+  "9sm5xK": { 
+    longURL: "http://www.google.com",
+    userID: 'admin'
+  }
 };
 
-const userDatabase = {};
+const userDatabase = {
+  "admin": {
+    id: "admin",
+    email: "a@dmin",
+    password: "5up3r 53cur3"
+  }
+};
 
 const getUserByEmail = function(email) {
   let found = undefined;
@@ -80,13 +92,13 @@ const routes = {
     if (urlDatabase[req.params.id]) {
       return res.status(400).send('This Id is not in our database');
     }
-    
-    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id], user: userDatabase[req.cookies.userID]};
+
+    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.cookies.userID]};
     res.render('url_show', vars);
   },
 
   '/u/:id': function(req, res) {
-    const longURL = urlDatabase[req.params.id];
+    const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   }
 };
