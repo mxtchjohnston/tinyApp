@@ -6,15 +6,7 @@ const PORT = 8080; // default port 8080
 
 //BCRYPT EXAMPLE
 const bcrypt = require('bcryptjs');
-console.log(bcrypt);
 
-const salt = bcrypt.genSaltSync(10);
-// console.log('salt:', salt);
-
-// const hashed = bcrypt.hashSync('1234', salt);
-
-// console.log(bcrypt.compareSync('monkey', hashed));
-//
 
 //set up app
 const app = express();
@@ -22,7 +14,7 @@ app.set('view engine', 'ejs');
 app.use(cookieSession({
   name: 'whatever',
   keys: [bcrypt.hashSync('qwerty', 10)],
-}))
+}));
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
