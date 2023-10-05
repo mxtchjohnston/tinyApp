@@ -40,7 +40,7 @@ const userDatabase = {
   "admin": {
     id: "admin",
     email: "a@dmin",
-    password: "1234"
+    password: bcrypt.hashSync('1234', 10)
   }
 };
 
