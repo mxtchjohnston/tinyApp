@@ -1,17 +1,18 @@
 const express = require("express");
-const app = express();
 const cookie = require('cookie-parser');
 const morgan = require('morgan');
 const util = require('./util');
 const PORT = 8080; // default port 8080
 
+//set up app
+const app = express();
 app.set('view engine', 'ejs');
 app.use(cookie());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 
-
+//encrypted, secure, blazingly-fast, 7 sigma database
 const urlDatabase = {
   "b2xVn2": { 
     longURL: "http://www.lighthouselabs.ca",
@@ -31,30 +32,31 @@ const userDatabase = {
   }
 };
 
+//Whats a route anyway? paths and functions? sounds like an object to me
 const routes = {
-  '/': function(req, res) {
+  '/': (req, res) => {
     res.redirect('/urls');
   },
 
-  '/register': function(req, res) {
+  '/register': (req, res) => {
     if (req.cookies.userID) {
       return res.redirect('urls');
     }
     res.render('register', {user: userDatabase[req.cookies.userID]});
   },
 
-  '/login': function(req, res) {
+  '/login': (req, res) => {
     if (req.cookies.userID) {
       return res.redirect('urls');
     }
     res.render('login', {user: userDatabase[req.cookies.userID]});
   },
 
-  '/urls.json': function(req, res) {
+  '/urls.json': (req, res) => {
     res.json(urlDatabase);
   },
 
-  '/urls': function(req, res) {
+  '/urls': (req, res) => {
     const userID = req.cookies.userID;
     if (!userID) {
       return res.redirect('/login');
@@ -64,14 +66,14 @@ const routes = {
     res.render("urls_index", templateVars);
   },
 
-  '/urls/new': function(req, res) {
+  '/urls/new': (req, res) => {
     if (!req.cookies.userID) {
       return res.redirect('/login');
     }
     res.render("urls_new", {user: userDatabase[req.cookies.userID]});
   },
 
-  '/urls/:id': function(req, res) {
+  '/urls/:id': (req, res) => {
     if (!urlDatabase[req.params.id]) {
       return res.status(400).send('This Id is not in our database');
     }
@@ -80,14 +82,15 @@ const routes = {
     res.render('url_show', vars);
   },
 
-  '/u/:id': function(req, res) {
+  '/u/:id': (req, res) => {
     const longURL = urlDatabase[req.params.id].longURL;
     res.redirect(longURL);
   }
 };
 
+//same goes for post requests
 const posts = {
-  '/login': function(req, res) {
+  '/login': (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -110,7 +113,7 @@ const posts = {
     }
   },
 
-  '/register': function(req, res) {
+  '/register': (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -135,12 +138,12 @@ const posts = {
     res.redirect('/urls');
   },
 
-  '/logout': function(req, res) {
+  '/logout': (req, res) => {
     res.clearCookie('userID');
     res.redirect('/urls');
   },
 
-  '/urls/:id/delete': function(req, res) {
+  '/urls/:id/delete': (req, res) => {
     const id = req.params.id;
     if(req.cookies.userID !== urlDatabase[id].userID) {
       return res.status(400).send('You do not have permission to modify this resource');
@@ -150,7 +153,7 @@ const posts = {
     res.redirect(`/urls`);
   },
 
-  '/urls/:id': function(req, res) {
+  '/urls/:id': (req, res) => {
     // console.log(req.body.field);
     // console.log(req.params.id);
     
@@ -167,7 +170,7 @@ const posts = {
     res.redirect('/urls');
   },
 
-  '/urls': function(req, res) {
+  '/urls': (req, res) => {
     const userID = req.cookies.userID;
     if (!userID) {
       return res.status(400).send('You must be logged in to create a new url');
@@ -178,15 +181,18 @@ const posts = {
   },
 };
 
+//assign routes to app GETS
 for (const r in routes) {
   app.get(r, routes[r]);
   //console.log(r);
 }
 
+//asign posts to app POSTS
 for (const p in posts) {
   app.post(p, posts[p]);
 }
 
+//Amen
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
