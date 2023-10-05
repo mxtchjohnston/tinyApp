@@ -4,6 +4,12 @@ const morgan = require('morgan');
 const util = require('./util');
 const PORT = 8080; // default port 8080
 
+
+const bcrypt = require('bcryptjs');
+console.log(bcrypt);
+
+bcrypt.genSalt(10);
+
 //set up app
 const app = express();
 app.set('view engine', 'ejs');
