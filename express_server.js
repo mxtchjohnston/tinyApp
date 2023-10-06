@@ -47,7 +47,8 @@ const routes = {
   '/urls': (req, res) => {
     const userID = req.session.userID;
     if (!userID) {
-      return res.redirect('/login');
+      const templateVars = {user: undefined, message: 'You must be logged in to view the urls page'};
+      return res.status(400).render('pages/error', templateVars);
     }
     const urls = util.getUrlsForUser(urlDatabase, userID);
     const templateVars = {urls, user: userDatabase[userID]};
@@ -77,8 +78,12 @@ const routes = {
   },
 
   '/u/:id': (req, res) => {
-    const longURL = urlDatabase[req.params.id].longURL;
-    res.redirect(longURL);
+    const URL = urlDatabase[req.params.id];
+    if (!URL) {
+      const templateVars = {user: userDatabase[req.session.userID], message: 'This url is not in our Database'};
+      return res.status(404).render('pages/error', templateVars);
+    }
+    res.redirect(URL.longURL);
   }
 };
 
