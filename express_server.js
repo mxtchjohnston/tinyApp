@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const util = require('./util');
@@ -21,20 +21,20 @@ app.use(express.urlencoded({ extended: true }));
 
 //encrypted, secure, blazingly-fast, 7 sigma database
 const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
+  'b2xVn2': {
+    longURL: 'http://www.lighthouselabs.ca',
     userID: 'admin'
   },
-  "9sm5xK": {
-    longURL: "http://www.google.com",
+  '9sm5xK': {
+    longURL: 'http://www.google.com',
     userID: 'admin'
   }
 };
 
 const userDatabase = {
-  "admin": {
-    id: "admin",
-    email: "a@dmin",
+  'admin': {
+    id: 'admin',
+    email: 'a@dmin',
     password: bcrypt.hashSync('1234', 10)
   }
 };
@@ -66,14 +66,14 @@ const routes = {
     }
     const urls = util.getUrlsForUser(urlDatabase, userID);
     const templateVars = {urls, user: userDatabase[userID]};
-    res.render("pages/urls_index", templateVars);
+    res.render('pages/urls_index', templateVars);
   },
 
   '/urls/new': (req, res) => {
     if (!req.session.userID) {
       return res.redirect('/login');
     }
-    res.render("pages/urls_new", {user: userDatabase[req.session.userID]});
+    res.render('pages/urls_new', {user: userDatabase[req.session.userID]});
   },
 
   '/urls/:id': (req, res) => {
@@ -84,7 +84,7 @@ const routes = {
 
     if (req.session.userID !== urlDatabase[req.params.id].userID) {
       const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
 
     const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.session.userID]};
@@ -104,23 +104,23 @@ const posts = {
     const password = req.body.password;
 
     //if empty
-    if (email === "" || password === "") {
+    if (email === '' || password === '') {
       const templateVars = {message: 'Please enter an email and/or password', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
 
     const user = util.getUserByEmail(email, userDatabase);
 
     if (!user) {
       const templateVars = {message: 'User is not registered yet', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
     if (bcrypt.compareSync(password, user.password)) {
       req.session.userID = user.id;
       res.redirect('/urls');
     } else {
       const templateVars = {message: 'Somethings wrong with your email/password', user: userDatabase[req.session.userID]};
-      return res.status(403).render("pages/error", templateVars);
+      return res.status(403).render('pages/error', templateVars);
     }
   },
 
@@ -129,15 +129,15 @@ const posts = {
     const password = req.body.password;
 
     //if empty
-    if (email === "" || password === "") {
+    if (email === '' || password === '') {
       const templateVars = {message: 'Please enter an email and/or password', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
 
     //if email exists
     if (util.getUserByEmail(email, userDatabase)) {
       const templateVars = {message: 'User is already exists', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
 
     const id = util.generateRandomString(6);
@@ -159,7 +159,7 @@ const posts = {
     const id = req.params.id;
     if (req.session.userID !== urlDatabase[id].userID) {
       const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
     //console.log(id);
     delete urlDatabase[id];
@@ -176,7 +176,7 @@ const posts = {
 
     if (userID !== urlDatabase[id].userID) {
       const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
 
     urlDatabase[id] = {longURL, userID};
@@ -188,7 +188,7 @@ const posts = {
     const userID = req.session.userID;
     if (!userID) {
       const templateVars = {message: 'You do must be logged in to create a url', user: userDatabase[req.session.userID]};
-      return res.status(400).render("pages/error", templateVars);
+      return res.status(400).render('pages/error', templateVars);
     }
     const id = util.generateRandomString(6);
     urlDatabase[id] = { longURL: req.body.longURL, userID};
