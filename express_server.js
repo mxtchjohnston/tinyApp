@@ -4,6 +4,7 @@ const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
 const util = require('./util');
+const db = require('./database.js');
 
 const PORT = 8080; // default port 8080
 
@@ -20,26 +21,8 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 
-//encrypted, secure, blazingly-fast, 7 sigma database
-const urlDatabase = {
-  'b2xVn2': {
-    longURL: 'http://www.lighthouselabs.ca',
-    userID: 'admin'
-  },
-  '9sm5xK': {
-    longURL: 'http://www.google.com',
-    userID: 'admin'
-  }
-};
-
-//provide default user for example purposes
-const userDatabase = {
-  'admin': { 
-    id: 'admin',
-    email: 'a@dmin',
-    password: bcrypt.hashSync('1234', 10)
-  }
-};
+const userDatabase = db.userDatabase;
+const urlDatabase = db.urlDatabase;
 
 //Whats a route anyway? paths and functions? sounds like an object to me
 const routes = {
