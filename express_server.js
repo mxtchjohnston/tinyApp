@@ -78,11 +78,17 @@ const routes = {
 
   '/urls/:id': (req, res) => {
     if (!urlDatabase[req.params.id]) {
-      return res.status(400).send('This Id is not in our database');
+      const templateVars = {message: 'This ID is not in our database', user: userDatabase[req.session.userID]};
+      return res.status(400).render('pages/error', templateVars);
     }
 
-    const vars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.session.userID]};
-    res.render('pages/url_show', vars);
+    if (req.session.userID !== urlDatabase[req.params.id].userID) {
+      const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
+    }
+
+    const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id].longURL, user: userDatabase[req.session.userID]};
+    res.render('pages/url_show', templateVars);
   },
 
   '/u/:id': (req, res) => {
@@ -99,20 +105,22 @@ const posts = {
 
     //if empty
     if (email === "" || password === "") {
-      res.status(400).send("Please enter an email and/or password");
-      return;
+      const templateVars = {message: 'Please enter an email and/or password', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
 
     const user = util.getUserByEmail(email, userDatabase);
 
     if (!user) {
-      return res.status(400).send('User not found');
+      const templateVars = {message: 'User is not registered yet', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
     if (bcrypt.compareSync(password, user.password)) {
       req.session.userID = user.id;
       res.redirect('/urls');
     } else {
-      res.status(403).send("Somethings wrong with your username and password");
+      const templateVars = {message: 'Somethings wrong with your email/password', user: userDatabase[req.session.userID]};
+      return res.status(403).render("pages/error", templateVars);
     }
   },
 
@@ -122,14 +130,14 @@ const posts = {
 
     //if empty
     if (email === "" || password === "") {
-      res.status(400).send("Please enter an email and/or password");
-      return;
+      const templateVars = {message: 'Please enter an email and/or password', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
 
     //if email exists
     if (util.getUserByEmail(email, userDatabase)) {
-      res.status(400).send("User already exists");
-      return;
+      const templateVars = {message: 'User is already exists', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
 
     const id = util.generateRandomString(6);
@@ -150,7 +158,8 @@ const posts = {
   '/urls/:id/delete': (req, res) => {
     const id = req.params.id;
     if (req.session.userID !== urlDatabase[id].userID) {
-      return res.status(400).send('You do not have permission to modify this resource');
+      const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
     //console.log(id);
     delete urlDatabase[id];
@@ -166,7 +175,8 @@ const posts = {
     const userID = req.session.userID;
 
     if (userID !== urlDatabase[id].userID) {
-      return res.status(400).send('You do not have permission to modify this resource');
+      const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
 
     urlDatabase[id] = {longURL, userID};
@@ -177,7 +187,8 @@ const posts = {
   '/urls': (req, res) => {
     const userID = req.session.userID;
     if (!userID) {
-      return res.status(400).send('You must be logged in to create a new url');
+      const templateVars = {message: 'You do must be logged in to create a url', user: userDatabase[req.session.userID]};
+      return res.status(400).render("pages/error", templateVars);
     }
     const id = util.generateRandomString(6);
     urlDatabase[id] = { longURL: req.body.longURL, userID};
