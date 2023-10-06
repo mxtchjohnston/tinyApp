@@ -1,11 +1,12 @@
+//Imports
 const express = require('express');
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
+const bcrypt = require('bcryptjs');
 const util = require('./util');
+
 const PORT = 8080; // default port 8080
 
-//BCRYPT EXAMPLE
-const bcrypt = require('bcryptjs');
 
 
 //set up app
@@ -31,8 +32,9 @@ const urlDatabase = {
   }
 };
 
+//provide default user for example purposes
 const userDatabase = {
-  'admin': {
+  'admin': { 
     id: 'admin',
     email: 'a@dmin',
     password: bcrypt.hashSync('1234', 10)
@@ -110,11 +112,12 @@ const posts = {
     }
 
     const user = util.getUserByEmail(email, userDatabase);
-
+    //if user does not exist
     if (!user) {
       const templateVars = {message: 'User is not registered yet', user: userDatabase[req.session.userID]};
       return res.status(400).render('pages/error', templateVars);
     }
+    //check password equality
     if (bcrypt.compareSync(password, user.password)) {
       req.session.userID = user.id;
       res.redirect('/urls');
@@ -140,12 +143,12 @@ const posts = {
       return res.status(400).render('pages/error', templateVars);
     }
 
+    //continue if checks pass
     const id = util.generateRandomString(6);
 
 
     userDatabase[id] = {id, email, password: bcrypt.hashSync(password, 10)};
-    //res.cookie('userID', userDatabase[id]);
-    console.log(userDatabase);
+    //console.log(userDatabase);
     req.session.userID = id;
     res.redirect('/urls');
   },
@@ -157,6 +160,8 @@ const posts = {
 
   '/urls/:id/delete': (req, res) => {
     const id = req.params.id;
+
+    //check permissions
     if (req.session.userID !== urlDatabase[id].userID) {
       const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
       return res.status(400).render('pages/error', templateVars);
