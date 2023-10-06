@@ -148,7 +148,6 @@ const posts = {
 
 
     userDatabase[id] = {id, email, password: bcrypt.hashSync(password, 10)};
-    //console.log(userDatabase);
     req.session.userID = id;
     res.redirect('/urls');
   },
@@ -166,14 +165,12 @@ const posts = {
       const templateVars = {message: 'You do not have permission to edit this resource', user: userDatabase[req.session.userID]};
       return res.status(400).render('pages/error', templateVars);
     }
-    //console.log(id);
+    
     delete urlDatabase[id];
     res.redirect(`/urls`);
   },
 
   '/urls/:id': (req, res) => {
-    // console.log(req.body.field);
-    // console.log(req.params.id);
     
     const longURL = req.body.field;
     const id = req.params.id;
@@ -185,7 +182,6 @@ const posts = {
     }
 
     urlDatabase[id] = {longURL, userID};
-    //console.log(urlDatabase);
     res.redirect('/urls');
   },
 
@@ -204,7 +200,6 @@ const posts = {
 //assign routes to app GETS
 for (const r in routes) {
   app.get(r, routes[r]);
-  //console.log(r);
 }
 
 //asign posts to app POSTS
