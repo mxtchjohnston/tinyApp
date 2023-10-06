@@ -1,5 +1,5 @@
 # To Start
-* `npm i`
+* `npm install`
 * `npm start` or `node express_server.js`
 # To Login as Administrator
 * email: a@dmin
@@ -28,6 +28,11 @@
   * package.json
   * README.md
   * util.js
+
+# Gallery
+![index](/img/url_index.png)
+![show](/img/url_show.png)
+![error](/img/error.png)
 
   # Thanks To:
 * Lighthouse Labs
